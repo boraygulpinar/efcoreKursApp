@@ -1,0 +1,16 @@
+﻿@model Ogrenci
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+    <b>@Model.OgrenciAd @Model.OgrenciSoyad</b> isimli öğrenciyi silmek istiyor musunuz?
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.OgrenciId" />
+        <button type="submit" class="btn btn-danger">Onayla</button>
+        <a asp-action="Index" class="btn btn-primary">Vazgeç</a>
+    </form>
+</p>
+
