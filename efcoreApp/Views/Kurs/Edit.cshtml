@@ -1,0 +1,19 @@
+﻿@model Kurs
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Öğrenci Güncelleme</h2>
+<hr />
+
+<form asp-controller="Kurs" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="KursId" />
+    <div class="mb3">
+        <label asp-for="KursBaslik" class="form-label">Kurs Başlık</label>
+        <input asp-for="KursBaslik" class="form-control" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-secondary">Kaydet</button>
+</form>
+
