@@ -41,7 +41,10 @@ namespace efcoreApp.Controllers
             }
 
             //var ogrenci = await _context.Ogrenciler.FirstOrDefaultAsync(ogr => ogr.OgrenciId == id);
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
+            var ogrenci = await _context.Ogrenciler
+                                .Include(o => o.KursKayitlari)
+                                .ThenInclude(o=>o.Kurs)
+                                .FirstOrDefaultAsync(o => o.OgrenciId == id);
 
             if (ogrenci == null)
             {
@@ -55,7 +58,7 @@ namespace efcoreApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Ogrenci model)
         {
-            if(id != model.OgrenciId)
+            if (id != model.OgrenciId)
             {
                 return NotFound();
             }
@@ -69,7 +72,7 @@ namespace efcoreApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if(!_context.Ogrenciler.Any(o => o.OgrenciId == model.OgrenciId))
+                    if (!_context.Ogrenciler.Any(o => o.OgrenciId == model.OgrenciId))
                     {
                         return NotFound();
                     }
@@ -94,7 +97,7 @@ namespace efcoreApp.Controllers
 
             var ogrenci = await _context.Ogrenciler.FindAsync(id);
 
-            if(ogrenci == null)
+            if (ogrenci == null)
             {
                 return NotFound();
             }
@@ -103,10 +106,10 @@ namespace efcoreApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete([FromForm]int id)
+        public async Task<IActionResult> Delete([FromForm] int id)
         {
             var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if(ogrenci == null)
+            if (ogrenci == null)
             {
                 return NotFound();
             }

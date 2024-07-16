@@ -1,5 +1,7 @@
 ﻿using efcoreApp.Data;
+using efcoreApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace efcoreApp.Controllers
@@ -15,24 +17,30 @@ namespace efcoreApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var kurslar = await _dataContext.Kurslar.ToListAsync();
+            var kurslar = await _dataContext.Kurslar.Include(k => k.Ogretmen).ToListAsync();
             return View(kurslar);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Ogretmenler = new SelectList(await _dataContext.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Create(Kurs model)
+        public async Task<IActionResult> Create(KursViewModel model)
         {
-            _dataContext.Kurslar.Add(model);
-            await _dataContext.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _dataContext.Kurslar.Add(new Kurs() { KursId = model.KursId, KursBaslik = model.KursBaslik, OgretmenId = model.OgretmenId });
+                await _dataContext.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            ViewBag.Ogretmenler = new SelectList(await _dataContext.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
+            return View(model);
         }
 
         [HttpGet]
@@ -43,19 +51,32 @@ namespace efcoreApp.Controllers
                 return NotFound();
             }
 
-            var kurs = await _dataContext.Kurslar.FindAsync(id);
+            var kurs = await _dataContext
+                            .Kurslar
+                            .Include(k => k.KursKayitlari)
+                            .ThenInclude(k => k.Ogrenci)
+                            .Select(k => new KursViewModel
+                            {
+                                KursId = k.KursId,
+                                KursBaslik = k.KursBaslik,
+                                OgretmenId = k.OgretmenId,
+                                KursKayitlari = k.KursKayitlari
+                            })
+                            .FirstOrDefaultAsync(k => k.KursId == id);
 
             if (kurs == null)
             {
                 return NotFound();
             }
 
+            ViewBag.Ogretmenler = new SelectList(await _dataContext.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
+
             return View(kurs);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Kurs model)
+        public async Task<IActionResult> Edit(int id, KursViewModel model)
         {
             if (id != model.KursId)
             {
@@ -66,7 +87,7 @@ namespace efcoreApp.Controllers
             {
                 try
                 {
-                    _dataContext.Update(model);
+                    _dataContext.Update(new Kurs() { KursId = model.KursId, KursBaslik = model.KursBaslik, OgretmenId = model.OgretmenId });
                     await _dataContext.SaveChangesAsync();
                 }
                 catch (DbUpdateException)
@@ -82,7 +103,7 @@ namespace efcoreApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
-
+            ViewBag.Ogretmenler = new SelectList(await _dataContext.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
             return View(model);
         }
 

@@ -1,14 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace efcoreApp.Data
+﻿using efcoreApp.Data;
+using efcoreApp.Models;
+using System.ComponentModel.DataAnnotations;
+namespace efcoreApp.Models
 {
-    public class Kurs
+    public class KursViewModel
     {
-        [Key]
         public int KursId { get; set; }
+        [Required]
+        [StringLength(100)]
         public string? KursBaslik { get; set; }
         public int OgretmenId { get; set; }
-        public Ogretmen Ogretmen { get; set; } = null!;
         public ICollection<KursKayit> KursKayitlari { get; set; } = new List<KursKayit>();
+
     }
 }

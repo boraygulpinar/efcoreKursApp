@@ -1,4 +1,4 @@
-﻿@model Kurs
+﻿@model KursViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -9,9 +9,16 @@
 <hr />
 
 <form asp-controller="Kurs" asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
     <div class="mb3">
         <label asp-for="KursBaslik" class="form-label">Kurs Başlık</label>
         <input asp-for="KursBaslik" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="OgretmenId" class="form-label">Öğretmen</label>
+        <select asp-for="OgretmenId" asp-items="ViewBag.Ogretmenler" class="form-select">
+            <option value="">Seçiniz</option>
+        </select>
     </div>
     <br />
 
